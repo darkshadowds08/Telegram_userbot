@@ -1,3 +1,9 @@
+import asyncio
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
 import os
 import requests
 from pyrogram import Client, filters
@@ -5,9 +11,9 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask import Flask
 import threading
 
-API_ID = int(os.environ.get("API_ID", 31124352))
-API_HASH = os.environ.get("API_HASH", "832029294d40cb38e94a3f1be77c5c59")
-SESSION_STRING = os.environ.get("SESSION_STRING", "BAHa64AAeNUiRuUdZ3zFe-U0UPgS0yeq_fLBdcJmXWFChLwVhwzmoy8OZAkQiyI8YOivF5grGNbSpdlPCEe8-1YXV9KeEtJGbh3Sw8fVg1qJpMIJKvxi69mgZIvIAnobU0aOgj_ouawNsn3vlRikf9UxmAo0nDbHADG8aIiCHrB958ItF-FXkdM56prh-p0NmGKystmUKbbvv5H29-PLLXVJrkIvEVmBXeFZdGRIOY6I3xoehvasfjQR8cIVJ04WmoxSQ-E3VW6rLpl8bcbst1q8_1nBzh-qm59C-tCprF-xV6jh-hQxv7hGXgCWKyV5LodBMwvQJYx89aH7ImDM6_3mf0VC7QAAAAHOdfidAA")
+API_ID = int(os.environ.get("API_ID", 0))
+API_HASH = os.environ.get("API_HASH", "")
+SESSION_STRING = os.environ.get("SESSION_STRING", "")
 
 app = Client("my_bot_session", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 flask_app = Flask(__name__)
