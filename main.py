@@ -21,16 +21,15 @@ flask_app = Flask(__name__)
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-@app.on_message(filters.document | filters.video | filters.audio)
+# التعديل الهام: إضافة (filters.incoming | filters.me) لكي يستجيب البوت للملفات التي ترسلها لنفسك في الرسائل المحفوظة
+@app.on_message((filters.document | filters.video | filters.audio) & (filters.incoming | filters.me))
 async def handle_file(client, message):
     sent_msg = await message.reply("⏳ جاري تحميل الملف ورفعه إلى Pixeldrain...")
     
-    # تحميل الملف مؤقتاً على سيرفر Render
     file_path = await message.download(file_name=DOWNLOAD_DIR + "/")
     file_name = os.path.basename(file_path)
     
     try:
-        # رفع الملف إلى Pixeldrain مجاناً وبدون حساب
         url = "https://pixeldrain.com/api/file"
         with open(file_path, "rb") as f:
             response = requests.post(url, files={"file": f})
@@ -38,8 +37,6 @@ async def handle_file(client, message):
         if response.status_code == 201:
             res_data = response.json()
             file_id = res_data.get("id")
-            
-            # الرابط المباشر السريع (جاهز لـ IDM)
             direct_link = f"https://pixeldrain.com/api/file/{file_id}"
             
             keyboard = InlineKeyboardMarkup([
@@ -59,7 +56,6 @@ async def handle_file(client, message):
     except Exception as e:
         await sent_msg.edit_text(f"❌ حدث خطأ: `{str(e)}`", parse_mode="Markdown")
     finally:
-        # مسح النسخة المؤقتة من سيرفر Render فوراً لتفريغ المساحة
         if os.path.exists(file_path):
             os.remove(file_path)
 
